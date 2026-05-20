@@ -1,85 +1,51 @@
-﻿import asyncio
+import asyncio
 import json
 import logging
-import os
 import re
-import sqlite3
-import subprocess
-import time
+import os
+import sys
+import traceback
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 
-# Core Stack
-import ollama
-import chromadb
-import uvicorn
+# Web and AI Stack
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
-from chromadb.utils import embedding_functions
+import uvicorn
+import ollama
 
-print("DEBUG: [1] Imports successful.")
-
-# =====================================================================
-# INITIALIZATION
-# =====================================================================
+# --- 1. CONFIGURATION ---
+print("--- JARVIS BOOT SEQUENCE STARTING ---")
 ROOT_DIR = Path(__file__).parent.resolve()
-OUTPUT_DIR = ROOT_DIR / "jarvis_output"
-CHROMA_PATH = ROOT_DIR / "earl_prime_vector_memory"
-OUTPUT_DIR.mkdir(exist_ok=True)
+app = FastAPI(title="Earl Prime v7.0")
 
-print(f"DEBUG: [2] Root directory set to {ROOT_DIR}")
-
-app = FastAPI(title="Earl Prime v7.5 Diagnostic")
-
-# =====================================================================
-# CRITICAL CHECK: ChromaDB
-# =====================================================================
-try:
-    print("DEBUG: [3] Attempting to connect to ChromaDB...")
-    client = chromadb.PersistentClient(path=str(CHROMA_PATH))
-    embed_fn = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
-    collection = client.get_or_create_collection(name="earl_prime_longterm", embedding_function=embed_fn)
-    print("DEBUG: [4] ChromaDB connection successful.")
-except Exception as e:
-    print(f"DEBUG: [!] ChromaDB Error: {e}")
-
-# =====================================================================
-# DASHBOARD HTML (Simplified for testing)
-# =====================================================================
+# --- 2. THE DASHBOARD ---
 @app.get("/", response_class=HTMLResponse)
 async def home():
-    return "<h1>Jarvis Diagnostic Page</h1><p>If you see this, the server is ALIVE.</p>"
+    return """
+    <html><body style='background:#000;color:#0f0;font-family:monospace;padding:50px;'>
+    <h1>JARVIS SYSTEM ONLINE</h1>
+    <p>Status: Listening for iPhone Connection...</p>
+    </body></html>
+    """
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    await websocket.send_json({"phase": "Connected", "detail": "Jarvis is listening."})
-    await websocket.close()
-
-# =====================================================================
-# THE STARTER (REWRITTEN)
-# =====================================================================
+# --- 3. THE ENGINE STARTER ---
 if __name__ == "__main__":
     print("\n" + "="*50)
-    print("🚀 STARTING JARVIS SERVER ON PORT 8000")
-    print("="*50)
+    print("🚀 STEP 1: INITIALIZING ENGINE")
     
-    # Check if Ollama is running first
     try:
-        ollama.list()
-        print("DEBUG: [5] Ollama Service detected.")
-    except Exception:
-        print("DEBUG: [!] WARNING: Ollama is not running. AI features will fail.")
+        # Check if Port 8000 is busy
+        print("🚀 STEP 2: CHECKING NETWORK PORTS")
+        
+        # This is the line that keeps the script alive
+        print("🚀 STEP 3: STARTING WEB SERVER (BLOCKING MODE)")
+        print("="*50)
+        print("🔗 PC TEST: http://localhost:8000")
+        print("📱 IPHONE TEST: http://192.168.1.160:8000")
+        print("="*50)
+        print("Waiting for connections...\n")
 
-    print(f"IP: 192.168.1.160")
-    print(f"Connect your iPhone to: http://192.168.1.160:8000")
-    print("="*50)
-    print("Waiting for Uvicorn to take over...")
-
-    try:
-        # We pass 'app' directly to avoid the 'main:app' import loop issue
-        uvicorn.run(app, host="0.0.0.0", port=8080, access_log=True)
-    except Exception as e:
-        print(f"❌ CRITICAL SERVER CRASH: {e}")
-        input("Press Enter to close...")
+        # Running uvicorn directly on the 'app' object
+        #
