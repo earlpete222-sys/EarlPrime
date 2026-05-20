@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     try:
         # We pass 'app' directly to avoid the 'main:app' import loop issue
-        uvicorn.run(app, host="0.0.0.0", port=8000, access_log=True)
+        uvicorn.run(app, host="0.0.0.0", port=8080, access_log=True)
     except Exception as e:
         print(f"❌ CRITICAL SERVER CRASH: {e}")
         input("Press Enter to close...")
