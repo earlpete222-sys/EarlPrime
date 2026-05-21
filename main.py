@@ -22,7 +22,8 @@ ROOT_DIR = Path("C:/EarlPrime").resolve()
 TOOLS_DIR = ROOT_DIR / "learned_tools"
 TOOLS_DIR.mkdir(exist_ok=True)
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(node)s] %(message)s")
+# FIX: Swapped out non-standard '%(node)s' with '%(levelname)s' to prevent internal formatting crashes
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("JarvisV8")
 
 app = FastAPI(title="Jarvis Git-Host v8.0")
@@ -66,7 +67,8 @@ class JarvisEngine:
         sys_prompt = (
             "You are Jarvis. You create Python tools. "
             "You MUST respond with a JSON block: "
-            "```json\n{\"file_name\": \"name.py\", \"code\": \"code here\", \"summary\": \"description\"}\n```"
+            "```json\n{\"file_name\": \"name.py\", \"code\": \"code here\", \"summary\": \"description\"}\n
+```"
         )
         
         try:
@@ -152,5 +154,5 @@ if __name__ == "__main__":
     print("  IPHONE: http://192.168.1.160:8000")
     print("="*50)
     
-    # Run the server and keep the process alive
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # FIX: Pass the app as an explicit module string target ("main:app") to guarantee process binding on Windows loopbacks
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
